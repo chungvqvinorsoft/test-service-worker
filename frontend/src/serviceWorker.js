@@ -12,16 +12,17 @@
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    // [::1] is the IPv6 localhost address.
-    window.location.hostname === '[::1]' ||
-    // 127.0.0.0/8 are considered localhost for IPv4.
-    window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+  // [::1] is the IPv6 localhost address.
+  window.location.hostname === '[::1]' ||
+  // 127.0.0.0/8 are considered localhost for IPv4.
+  window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
 const pushServerPublicKey =
   'BIN2Jc5Vmkmy-S3AUrcMlpKxJpLeVRAfu9WBqUbJ70SJOCWGCGXKY-Xzyh7HDr6KbRDGYHjqZ06OcS3BjD7uAm8';
-
-export function register(config) {
+export async function register(config) {
+  // console.log(process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator);
+  // console.log(window.location.href);
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
@@ -34,7 +35,6 @@ export function register(config) {
 
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
-
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config);
@@ -42,9 +42,10 @@ export function register(config) {
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
         navigator.serviceWorker.ready.then(() => {
+          debugger
           console.log(
             'This web app is being served cache-first by a service ' +
-              'worker. To learn more, visit https://bit.ly/CRA-PWA'
+            'worker. To learn more, visit https://bit.ly/CRA-PWA'
           );
         });
       } else {
@@ -53,6 +54,8 @@ export function register(config) {
         console.log('aaa');
       }
     });
+  } else {
+    debugger
   }
 }
 
@@ -73,7 +76,7 @@ function registerValidSW(swUrl, config) {
               // content until all client tabs are closed.
               console.log(
                 'New content is available and will be used when all ' +
-                  'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
+                'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
               );
 
               // Execute callback
@@ -146,23 +149,35 @@ export async function askUserPermission() {
 
 export async function createNotificationSubscription() {
   //wait for service worker installation to be ready
-
-  const serviceWorker = await navigator.serviceWorker.ready;
-
-  // subscribe and return the subscription
+  console.log(navigator);
+  const serviceWorker = await navigator.serviceWorker.ready
+  // // subscribe and return the subscription
+  console.log('success');
   return await serviceWorker.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: pushServerPublicKey
   });
 }
 
+// export function createNotificationSubscription() {
+//   //wait for service worker installation to be ready
+//   console.log(navigator);
+//   navigator.serviceWorker.ready.then(function (res) {
+//     console.log('oke');
+//     res.pushManager.subscribe({
+//       userVisibleOnly: true,
+//       applicationServerKey: pushServerPublicKey
+//     });
+//   })
+// }
+
 export function getUserSubscription() {
   //wait for service worker installation to be ready, and then
   return navigator.serviceWorker.ready
-    .then(function(serviceWorker) {
+    .then(function (serviceWorker) {
       return serviceWorker.pushManager.getSubscription();
     })
-    .then(function(pushSubscription) {
+    .then(function (pushSubscription) {
       return pushSubscription;
     });
 }
